@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import type { Highlight } from "@/lib/api";
 import HighlightCard from "./HighlightCard";
 import CreateDialog from "./CreateDialog";
@@ -8,40 +8,6 @@ import CreateDialog from "./CreateDialog";
 export default function HighlightsSection({ initial }: { initial: Highlight[] }) {
   const [items, setItems] = useState<Highlight[]>(initial);
   const [open, setOpen] = useState(false);
-  const [cols, setCols] = useState(3);
-
-  // Sync column count dynamically with the required Figma breakpoints:
-  // Mobile: < 788px (1 col)
-  // Tablet: 788px - 1279px (2 cols)
-  // Desktop: >= 1280px (3 cols)
-  useEffect(() => {
-    function updateColumns() {
-      const width = window.innerWidth;
-      if (width < 788) {
-        setCols(1);
-      } else if (width < 1280) {
-        setCols(2);
-      } else {
-        setCols(3);
-      }
-    }
-
-    updateColumns();
-    window.addEventListener("resize", updateColumns);
-    return () => window.removeEventListener("resize", updateColumns);
-  }, []);
-
-  // Distribute items across columns to achieve true masonry matching Figma mockup:
-  // Row 1: Item 0 (Col 1), Item 1 (Col 2), Item 2 (Col 3)
-  // Row 2: Item 3 (Col 1), Item 4 (Col 2), Item 5 (Col 3)
-  // Row 3: Item 6 (Col 1), Item 7 (Col 2), Item 8 (Col 3)
-  const columns = useMemo(() => {
-    const colBuckets: Highlight[][] = Array.from({ length: cols }, () => []);
-    items.forEach((item, index) => {
-      colBuckets[index % cols].push(item);
-    });
-    return colBuckets;
-  }, [items, cols]);
 
   return (
     <main className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-8 xl:px-12 py-10 md:py-14">
@@ -58,26 +24,16 @@ export default function HighlightsSection({ initial }: { initial: Highlight[] })
         </p>
       </header>
 
-      {/* Masonry Columns Layout */}
+      {/* Responsive Masonry Columns (Mobile: 1 col, Tablet: 2 cols, Desktop: 3 cols) */}
       <section
         aria-label="Highlights grid"
-        className={`mt-9 grid gap-4 sm:gap-5 items-start ${
-          cols === 1
-            ? "grid-cols-1"
-            : cols === 2
-            ? "grid-cols-2"
-            : "grid-cols-3"
-        }`}
+        className="mt-8 columns-1 gap-4 sm:gap-5 md:columns-2 xl:columns-3"
       >
-        {columns.map((colItems, colIdx) => (
-          <div key={colIdx} className="flex flex-col gap-4 sm:gap-5">
-            {colItems.map((h, i) => (
-              <HighlightCard
-                key={h.id != null ? `${h.id}` : `${h.title}-${colIdx}-${i}`}
-                h={h}
-              />
-            ))}
-          </div>
+        {items.map((h, i) => (
+          <HighlightCard
+            key={h.id != null ? `${h.id}` : `${h.title}-${i}`}
+            h={h}
+          />
         ))}
       </section>
 

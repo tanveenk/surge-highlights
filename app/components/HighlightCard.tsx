@@ -22,7 +22,7 @@ export default function HighlightCard({ h }: { h: Highlight }) {
   }, [h.title]);
 
   return (
-    <article className="group flex flex-col rounded-2xl bg-white p-3.5 sm:p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 hover:shadow-md transition-shadow duration-200 break-inside-avoid">
+    <article className="group mb-4 sm:mb-5 flex flex-col rounded-2xl bg-white p-3.5 sm:p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 hover:shadow-md transition-shadow duration-200 break-inside-avoid">
       <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-gray-100">
         {loading && (
           <div className="absolute inset-0 animate-pulse bg-gray-200" />
