@@ -1,5 +1,5 @@
 const BASE = "https://surgetakehome.vercel.app/api";
-const UUID = process.env.NEXT_PUBLIC_UUID;
+const UUID = process.env.NEXT_PUBLIC_UUID || "revenant";
 
 export type Highlight = {
   id?: string | number;
@@ -24,5 +24,9 @@ export async function createHighlight(
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error("Failed to create highlight");
+  const result = await res.json();
+  if (Array.isArray(result?.data) && result.data.length > 0) {
+    return result.data[0];
+  }
   return { id: Date.now(), ...body };
 }
