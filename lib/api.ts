@@ -18,15 +18,17 @@ export async function getHighlights(): Promise<Highlight[]> {
 export async function createHighlight(
   body: Pick<Highlight, "title" | "location" | "description">
 ): Promise<Highlight> {
-  const res = await fetch(`${BASE}/postreview/${UUID}`, {
+  // Use our internal Next.js API proxy to bypass browser CORS limitations
+  const res = await fetch("/api/highlights", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error("Failed to create highlight");
-  const result = await res.json();
-  if (Array.isArray(result?.data) && result.data.length > 0) {
-    return result.data[0];
+
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || "Failed to create highlight");
   }
-  return { id: Date.now(), ...body };
+
+  return await res.json();
 }
